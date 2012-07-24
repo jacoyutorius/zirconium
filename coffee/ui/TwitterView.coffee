@@ -4,6 +4,15 @@ TwitterView Class
 ###
 
 class TwitterView
+  
+    Ti.include("lib/twitter_api.js")
+    Ti.App.twitterApi = new TwitterApi({
+      consumerKey : "",
+      consumerSecret : ""
+    })
+    twitterApi = Ti.App.twitterApi
+    twitterApi.init()
+  
     constructor: () ->
         # Instance Variables
         @win = Ti.UI.createWindow
@@ -53,6 +62,33 @@ class TwitterView
             elements.addEventListener "click", callback
         win.leftNavButton.addEventListener "click", (e) ->
             win.close()
+        win.rightNavButton.addEventListener "click",(e) ->
+            twitterApi.statuses_update({
+              onSuccess:(response) ->
+                Ti.Api.info(response)
+                return win.close()
+              onError:(e) ->
+                alert(e)
+                Ti.Api.Error(e)
+              parameters:{status:textArea.value}
+            })
+            
+        textArea = Ti.UI.createTextArea
+          value:' #TitaniumJP',
+          height:140,
+          width:300,
+          top:10,
+          font:{fontSize:20,fontWeight:'bold'},
+          color:'#888',
+          textAlign:'left',
+          appearance:Titanium.UI.KEYBOARD_APPEARANCE_ALERT, 
+          keyboardType:Titanium.UI.KEYBOARD_ASCII,
+          borderWidth:2,
+          borderColor:'#bbb',
+          borderRadius:5,
+          suppressReturn:false  
+           
+        win.add textArea     
         return win
 
     # [Function] Timeline Composer
